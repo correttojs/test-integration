@@ -39,7 +39,7 @@ const postMessage = async ({
   console.log(d);
 };
 
-const getChecks = () => {
+const getChecks = (req: NextApiRequest) => {
   return fetch(
     `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
     {
@@ -78,7 +78,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
         break;
       case "deployment-prepared":
-        const data = await getChecks();
+        const data = await getChecks(req);
 
         await waitTime(7_000);
 
