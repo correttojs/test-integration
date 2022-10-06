@@ -3,6 +3,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 const TOKEN = "aDfz6ZwDnHzgimgM3ehOSSi7";
 const AXIOM_TOKEN = "xaat-91ca3499-12a8-406e-96b5-5f17348e985c";
 
+const waitTime = (timeout: number) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
+
 const postMessage = async ({
   deploymentId,
   webhookType,
@@ -72,27 +76,29 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           }
         ).then((r) => r.json());
 
-        // const result = await fetch(
-        //   `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks/${data.checks[0].id}`,
-        //   {
-        //     body: JSON.stringify({
-        //       conclusion: "succeeded",
-        //       status: "completed",
-        //     }),
-        //     headers: {
-        //       Authorization: `Bearer ${TOKEN}`,
-        //       "Content-Type": "application/json",
-        //     },
-        //     method: "patch",
-        //   }
-        // ).then((r) => r.json());
+        await waitTime(30_000);
+
+        const result = await fetch(
+          `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks/${data.checks[0].id}`,
+          {
+            body: JSON.stringify({
+              conclusion: "succeeded",
+              status: "completed",
+            }),
+            headers: {
+              Authorization: `Bearer ${TOKEN}`,
+              "Content-Type": "application/json",
+            },
+            method: "patch",
+          }
+        ).then((r) => r.json());
 
         await postMessage({
           deploymentId: req.body.payload.deployment.id,
           webhookType: req.body.type,
           payload: {
             checks: data,
-            // updateCheck: result
+            updateCheck: result,
           },
           level: "debug",
         });
