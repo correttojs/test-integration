@@ -16,6 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }),
         headers: {
           Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
         },
         method: "post",
       }
@@ -42,6 +43,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }),
         headers: {
           Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
         },
         method: "patch",
       }
