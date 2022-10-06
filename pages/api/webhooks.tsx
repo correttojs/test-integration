@@ -22,12 +22,14 @@ const postMessage = async ({
         "Content-Type": "application/json",
         Authorization: `Bearer ${AXIOM_TOKEN}`,
       },
-      body: JSON.stringify({
-        time: new Date().toISOString(),
-        data: { payload },
-        level,
-        tags: { deploymentId, webhookType },
-      }),
+      body: JSON.stringify([
+        {
+          time: new Date().toISOString(),
+          data: { payload },
+          level,
+          tags: { deploymentId, webhookType },
+        },
+      ]),
     }
   ).then((r) => r.json());
   console.log(d);
