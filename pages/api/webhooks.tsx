@@ -76,7 +76,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           }
         ).then((r) => r.json());
 
-        await waitTime(30_000);
+        await waitTime(7_000);
 
         const result = await fetch(
           `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks/${data.checks[0].id}`,
