@@ -40,6 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       {
         body: JSON.stringify({
           conclusion: "succeeded",
+          status: "completed",
         }),
         headers: {
           Authorization: `Bearer ${TOKEN}`,
