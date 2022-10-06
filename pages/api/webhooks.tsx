@@ -2,6 +2,32 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 const TOKEN = "aDfz6ZwDnHzgimgM3ehOSSi7";
 
+const postMessage = ({
+  deploymentId,
+  webhookType,
+  level,
+  payload,
+}: {
+  deploymentId: string;
+  webhookType: string;
+  payload?: any;
+  level: "info" | "error" | "debug";
+}) => {
+  fetch("https://cloud.axiom.co/api/v1/datasets/vercel/ingest", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer xaat-91ca3499-12a8-406e-96b5-5f17348e985c",
+    },
+    body: JSON.stringify({
+      time: new Date().toISOString(),
+      data: { payload },
+      level,
+      tags: { deploymentId, webhookType },
+    }),
+  });
+};
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.body.type) {
     case "deployment":
@@ -19,11 +45,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           method: "post",
         }
       ).then((r) => r.json());
-      console.log(
-        `Webhook ${req.body.type} received for deployment ${req.body.payload.deployment.id}`,
-        `Check created:`,
-        check
-      );
+
+      postMessage({
+        deploymentId: req.body.payload.deployment.id,
+        webhookType: req.body.type,
+        payload: check,
+        level: "debug",
+      });
       break;
     case "deployment-prepared":
       const data = await fetch(
@@ -50,20 +78,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           method: "patch",
         }
       ).then((r) => r.json());
-      console.log(
-        `Webhook ${req.body.type} received for deployment ${req.body.payload.deployment.id}`,
-        "Get Checks:",
-        data,
-        "Update Check:",
-        result
-      );
+
+      postMessage({
+        deploymentId: req.body.payload.deployment.id,
+        webhookType: req.body.type,
+        payload: { checks: data, updateCheck: result },
+        level: "debug",
+      });
     default:
-      console.log(
-        `Webhook ${req.body.type} received for deployment ${req.body.payload.deployment.id}`
-      );
+      postMessage({
+        deploymentId: req.body.payload.deployment.id,
+        webhookType: req.body.type,
+        payload: null,
+        level: "debug",
+      });
   }
 
-  if (req.body.type === "deployment-prepared") {
-  }
   res.json({ done: true });
 };
