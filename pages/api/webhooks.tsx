@@ -86,8 +86,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks/${data.checks[0].id}`,
           {
             body: JSON.stringify({
-              conclusion: "succeeded",
-              status: "completed",
+              conclusion: "skipped",
+              // status: "completed",
             }),
             headers: {
               Authorization: `Bearer ${TOKEN}`,
