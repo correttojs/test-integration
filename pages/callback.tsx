@@ -10,18 +10,6 @@ type VercelResponse = {
   team_id?: string;
 };
 
-export const getServerSideProps: GetServerSideProps = async (req) => {
-  const res = await fetch(
-    `https://rerun-checks-integration.vercel.joyn.de/api/get-access-token?code=${req.query.code}`
-  );
-  console.log(req.query.code);
-  const json = (await res.json()) as VercelResponse;
-
-  return {
-    props: json,
-  };
-};
-
 const CallbackPage: NextPage<VercelResponse> = () => {
   const router = useRouter();
   const [projects, setProjects] = useState<any[]>();
@@ -33,6 +21,7 @@ const CallbackPage: NextPage<VercelResponse> = () => {
     const fetchAccessToken = async (code: string) => {
       const res = await fetch(`/api/get-access-token?code=${code}`);
       const json = await res.json();
+      console.log(json);
 
       setData({
         accessToken: json.access_token,
@@ -64,7 +53,7 @@ const CallbackPage: NextPage<VercelResponse> = () => {
           }
         );
         const json = await res.json();
-
+        console.log(json);
         setProjects(json.projects);
       }
     };
