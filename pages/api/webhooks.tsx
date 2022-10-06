@@ -93,6 +93,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           payload: { checks: data, updateCheck: result },
           level: "debug",
         });
+        break;
       default:
         await postMessage({
           deploymentId: req.body.payload.deployment.id,
