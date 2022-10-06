@@ -5,8 +5,9 @@ const TOKEN = "aDfz6ZwDnHzgimgM3ehOSSi7";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   console.log("Webhook received", req.body.type);
   console.log("Webhook Payload", req.body);
+  console.log("Webhook Deployment Id", req.body.payload.deployment.id);
   if (req.body.type === "deployment") {
-    await fetch(
+    const check = await fetch(
       `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
       {
         body: JSON.stringify({
@@ -18,9 +19,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         },
         method: "post",
       }
-    );
+    ).then((r) => r.json());
+    console.log("Check", check);
   }
-  if (req.body.type === "deployment-ready") {
+  if (req.body.type === "deployment-prepared") {
     const data = await fetch(
       `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
       {
