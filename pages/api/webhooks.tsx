@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 const TOKEN = "aDfz6ZwDnHzgimgM3ehOSSi7";
+const AXIOM_TOKEN = "xaat-91ca3499-12a8-406e-96b5-5f17348e985c";
 
 const postMessage = async ({
   deploymentId,
@@ -19,7 +20,7 @@ const postMessage = async ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer xaat-91ca3499-12a8-406e-96b5-5f17348e985c",
+        Authorization: `Bearer ${AXIOM_TOKEN}`,
       },
       body: JSON.stringify({
         time: new Date().toISOString(),
