@@ -39,6 +39,18 @@ const postMessage = async ({
   console.log(d);
 };
 
+const getChecks = () => {
+  return fetch(
+    `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
+    {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      method: "get",
+    }
+  ).then((r) => r.json());
+};
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     switch (req.body.type) {
@@ -66,15 +78,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
         break;
       case "deployment-prepared":
-        const data = await fetch(
-          `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
-          {
-            headers: {
-              Authorization: `Bearer ${TOKEN}`,
-            },
-            method: "get",
-          }
-        ).then((r) => r.json());
+        const data = await getChecks();
 
         await waitTime(7_000);
 
@@ -97,8 +101,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           deploymentId: req.body.payload.deployment.id,
           webhookType: req.body.type,
           payload: {
-            checks: data,
+            checks: data.checks,
             updateCheck: result,
+          },
+          level: "debug",
+        });
+        break;
+      case "deployment-ready":
+        await postMessage({
+          deploymentId: req.body.payload.deployment.id,
+          webhookType: req.body.type,
+          payload: {
+            checks: (await getChecks()).checks,
           },
           level: "debug",
         });
