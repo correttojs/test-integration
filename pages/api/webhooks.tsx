@@ -112,7 +112,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           deploymentId: req.body.payload.deployment.id,
           webhookType: req.body.type,
           payload: {
-            checks: (await getChecks()).checks,
+            checks: (await getChecks(req)).checks,
           },
           level: "debug",
         });
