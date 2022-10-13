@@ -3,20 +3,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 const TOKEN = "aDfz6ZwDnHzgimgM3ehOSSi7";
 const AXIOM_TOKEN = "xaat-91ca3499-12a8-406e-96b5-5f17348e985c";
 
-const waitTime = (timeout: number) => {
-  return new Promise((resolve) => setTimeout(resolve, timeout));
-};
-
 const postMessage = async ({
   deploymentId,
   webhookType,
   level,
   payload,
+  link,
 }: {
   deploymentId: string;
   webhookType: string;
   payload?: any;
   level: "info" | "error" | "debug";
+  link?: string;
 }) => {
   const d = await fetch(
     "https://cloud.axiom.co/api/v1/datasets/vercel/ingest",
@@ -28,6 +26,7 @@ const postMessage = async ({
       },
       body: JSON.stringify([
         {
+          link,
           time: new Date().toISOString(),
           data: { payload },
           level,
@@ -55,6 +54,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     switch (req.body.type) {
       case "deployment":
+        // 1 - Register checks
         const check = await fetch(
           `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks`,
           {
@@ -73,14 +73,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await postMessage({
           deploymentId: req.body.payload.deployment.id,
           webhookType: req.body.type,
-          payload: req.body,
+          payload: check,
           level: "debug",
+          link: req.body.payload.deployment.url,
         });
         break;
       case "deployment-prepared":
-        const data = await getChecks(req);
+        // 2 - Run checks (i.e. npm run tests)...
 
-        await waitTime(7_000);
+        await fetch(req.body.payload.deployment.url).then((r) => r.text());
+
+        // 3 - Update checks
+        const data = await getChecks(req);
 
         const result = await fetch(
           `https://api.vercel.com/v1/deployments/${req.body.payload.deployment.id}/checks/${data.checks[0].id}`,
@@ -105,6 +109,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             updateCheck: result,
           },
           level: "debug",
+          link: req.body.payload.deployment.url,
         });
         break;
       case "deployment-ready":
