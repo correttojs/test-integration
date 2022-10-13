@@ -73,7 +73,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await postMessage({
           deploymentId: req.body.payload.deployment.id,
           webhookType: req.body.type,
-          payload: check,
+          payload: req.body,
           level: "debug",
         });
         break;
