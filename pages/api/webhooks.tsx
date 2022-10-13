@@ -81,7 +81,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       case "deployment-prepared":
         // 2 - Run checks (i.e. npm run tests)...
 
-        await fetch(req.body.payload.deployment.url).then((r) => r.text());
+        await fetch(`https://${req.body.payload.deployment.url}`).then((r) =>
+          r.text()
+        );
 
         // 3 - Update checks
         const data = await getChecks(req);
